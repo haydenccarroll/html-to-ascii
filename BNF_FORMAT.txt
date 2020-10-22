@@ -1,0 +1,8 @@
+<SingleTag> = <<TagName>/>
+<StartTag> = <<TagName>>
+<EndTag> = </<TagName>>
+<FullTag> = <StartTag>{any chars here}<EndTag> ; note startTag and endTag must have same tagName
+
+
+// dont search for tagName, only use for other stuff up top
+<TagName> = [a-zA-Z0-9]+
