@@ -2,13 +2,12 @@
 
 #include <string>
 #include <vector>
-#include <iostream>
-#include <algorithm>
+
+class TagList; // forward declaration of TagList (located in tagList.cpp)
 
 enum class TagType
 {
     SingleTag=0,
-    FullTag=1,
     OpenTag=2,
     CloseTag=3
 };
@@ -20,17 +19,16 @@ public:
     ~Tag(){};
     void printTag();
     void analyzeTag();
+    bool hasChildren();
 
 
     std::string tagStr;
     std::string tagName;
     TagType tagType;
-    std::vector<Tag> childTags;
+    TagList* childTags;
 
 private:
 
     void setTagType();
     void setTagName();
-    void nestAllTags();
-    int nestATag();
 };

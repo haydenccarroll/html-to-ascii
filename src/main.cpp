@@ -5,6 +5,4 @@
 int main()
 {
     Parser myParser("test.html");
-    myParser.addTags();
-    myParser.nestAllTags();
 }

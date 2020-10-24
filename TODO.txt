@@ -1,2 +1,2 @@
-get rid of tag related functions in parser.cpp, make them public in tag.hpp, so they can still be used
+work on getting stuff between tags to be included in a field of Tag
 work on getting html values to be recognized like <h1 name="so and so" color="red">

@@ -1,11 +1,16 @@
 #include "parser.hpp"
+#include "tagList.hpp"
+#include "tag.hpp"
+
 #include <regex>
 #include <iostream>
 #include <string>
-#include <stdlib.h>
+#include <cstdlib>
+#include <vector>
+#include <fstream>
+
 Parser::Parser(std::string fileName)
 {
-    
     std::ifstream f(fileName); //taking file as inputstream
     if(f)
     {
@@ -18,6 +23,8 @@ Parser::Parser(std::string fileName)
         std::cout << "Could not open " << fileName << '\n';
         exit(1);
     }
+    addTags();
+    m_tags.nestAllTags();
 }
 
 Parser::~Parser(){}
@@ -26,62 +33,6 @@ void Parser::addTags()
 {
     while (addNextTag())
         continue;
-}
-
-void Parser::nestAllTags()
-{
-    for (int i=0; i < m_tags.size(); i++)
-    {
-        nestATag(i);
-        m_tags[i].childTags[0].printTag();
-    }
-}
-
-int Parser::getMatchingTagIndex(unsigned tagIndex)
-{
-    if (m_tags.size() <= tagIndex) return -1;
-
-    // Useful for parsing the following: <div> <div></div> </div>
-    int openTagCount = 0; // num of unresolved tags.
-
-
-    std::string currentTagName = m_tags[tagIndex].tagName;
-    int endIndex = -1; // index of matching tag
-    for (unsigned i = 1; i < m_tags.size(); i++)
-    {
-        if (m_tags[i].tagName == currentTagName && 
-            m_tags[i].tagType == TagType::OpenTag)
-        {
-            openTagCount++;
-        }
-
-        if (m_tags[i].tagName == currentTagName && 
-            m_tags[i].tagType == TagType::CloseTag)
-        {
-            if (openTagCount == 0)
-                return i; // end index
-            openTagCount--;
-        }
-    }
-    return -1;
-}
-
-void Parser::nestATag(unsigned tagIndex)
-{
-    int matchingTagIndex = getMatchingTagIndex(tagIndex);
-    if (matchingTagIndex == -1)
-        return;
-    
-    std::string totalTagStr = "";
-    for (int i = tagIndex; i <= matchingTagIndex; i++)
-        totalTagStr += m_tags[i].tagStr;
-    // copies inner tags between the start/end tags to the child tag vector
-    m_tags[tagIndex].childTags = std::vector<Tag>(m_tags.begin() + tagIndex + 1,
-                                                  m_tags.begin() + matchingTagIndex);
-    // erases child tags
-    m_tags.erase(m_tags.begin() + tagIndex+1, m_tags.begin() + matchingTagIndex+1);
-
-    m_tags[tagIndex] = Tag(totalTagStr);
 }
 
 bool Parser::addNextTag()
@@ -113,7 +64,7 @@ bool Parser::addNextTag()
 
     if (foundMatch)
     {
-        m_tags.push_back(Tag(firstMatch.str()));
+        m_tags.pushBack(Tag(firstMatch.str()));
         m_inputString = firstMatch.suffix();
     }
 
